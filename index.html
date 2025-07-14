@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cliente para Servidor de Ferramentas</title>
+</head>
+<body>
+    <h1>Cliente para o seu Servidor</h1>
+
+    <h3>Testar Ferramenta: Contar Frequência</h3>
+    <textarea id="texto-input" placeholder="Digite um texto..."></textarea>
+    <button onclick="chamarContador()">Analisar Frequência</button>
+    <p>Resultado: <strong id="resultado-contador"></strong></p>
+
+    <script>
+        // AQUI ESTÁ A CORREÇÃO: Apontando para o servidor local
+        const API_BASE_URL = "http://127.0.0.1:8000";
+
+        async function chamarContador() {
+            const resultadoDiv = document.getElementById('resultado-contador');
+            const texto = document.getElementById('texto-input').value;
+            resultadoDiv.innerText = "Processando...";
+
+            try {
+                // Chamando o endpoint correto do nosso servidor
+                const response = await fetch(`${API_BASE_URL}/tool/contar_frequencia`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        arguments: { texto: texto }
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || `Erro HTTP ${response.status}`);
+                }
+                
+                resultadoDiv.innerText = data.result;
+
+            } catch (error) {
+                resultadoDiv.innerText = `Erro de comunicação: ${error}`;
+            }
+        }
+    </script>
+</body>
+</html>
